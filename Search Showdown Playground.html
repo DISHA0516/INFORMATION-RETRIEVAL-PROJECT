@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search Showdown · Group 4</title>
+<style>
+  :root{--bm:#ff7a1a;--dn:#7c5cff;--hy:#16c79a;--pink:#ff4d8d;--yellow:#ffd23f;--ink:#22223b;--soft:#f6f4ff;--line:#e4e0f5;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#fff7fb 0%,#f3f0ff 100%);min-height:100vh}
+  header{background:linear-gradient(120deg,#7c5cff,#ff4d8d 55%,#ffb347);color:#fff;padding:22px 18px 18px;text-align:center}
+  header h1{margin:0 0 6px;font-size:26px;letter-spacing:.3px}
+  header p{margin:0;font-size:14px;opacity:.95}
+  .dots span{display:inline-block;width:12px;height:12px;border-radius:50%;margin:0 4px;vertical-align:middle}
+  nav{display:flex;gap:8px;overflow-x:auto;padding:12px 14px;background:#fff;position:sticky;top:0;z-index:9;box-shadow:0 2px 10px rgba(124,92,255,.15)}
+  nav button{flex:0 0 auto;border:2px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:999px;font-size:14px;font-weight:bold;cursor:pointer;transition:.15s}
+  nav button:hover{transform:translateY(-2px)}
+  nav button.on{background:var(--dn);border-color:var(--dn);color:#fff;box-shadow:0 4px 12px rgba(124,92,255,.4)}
+  main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
+  section{display:none} section.on{display:block;animation:pop .25s}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .card{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px 16px;margin-bottom:16px;box-shadow:0 6px 18px rgba(124,92,255,.08)}
+  h2{margin:0 0 6px;font-size:20px} h3{margin:12px 0 6px;font-size:16px}
+  p{line-height:1.5;margin:6px 0;font-size:15px}
+  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:bold;color:#fff;margin-right:6px}
+  .t-bm{background:var(--bm)} .t-dn{background:var(--dn)} .t-hy{background:var(--hy)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+  .pills button{border:2px solid var(--line);background:#fff;padding:7px 12px;border-radius:999px;font-weight:bold;cursor:pointer;font-size:13px}
+  .pills button.on{background:var(--pink);border-color:var(--pink);color:#fff}
+  .row{margin:12px 0}
+  .lab{font-weight:bold;font-size:14px;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px}
+  .win{font-size:12px;background:var(--yellow);padding:2px 9px;border-radius:999px;white-space:nowrap}
+  .bar{display:flex;align-items:center;gap:8px;margin:3px 0}
+  .bar .n{width:58px;font-size:12px;font-weight:bold}
+  .bar .track{flex:1;background:#f0eefc;border-radius:999px;height:16px;overflow:hidden}
+  .bar .fill{height:100%;width:0;border-radius:999px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+  .bar .v{width:46px;font-size:12px;text-align:right}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .stat{border-radius:16px;padding:12px;color:#fff;text-align:center}
+  .stat b{font-size:22px;display:block} .stat small{opacity:.95}
+  .note{background:#fff8d6;border-left:5px solid var(--yellow);padding:10px 12px;border-radius:8px;font-size:14px;margin-top:10px}
+  input[type=text],textarea{width:100%;padding:10px 12px;font-size:15px;border:2px solid var(--line);border-radius:12px;font-family:inherit}
+  textarea{min-height:70px;resize:vertical}
+  button.big{background:linear-gradient(120deg,var(--dn),var(--pink));color:#fff;border:none;padding:11px 20px;border-radius:999px;font-size:15px;font-weight:bold;cursor:pointer;margin-top:8px}
+  button.sm{border:2px solid var(--line);background:#fff;border-radius:999px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold}
+  .chip{display:inline-block;padding:4px 10px;margin:3px;border-radius:999px;font-size:13px;font-weight:bold}
+  .shared{background:#c8f7e4;color:#067a55} .miss{background:#eceaf6;color:#6b6890}
+  .meter{height:26px;border-radius:999px;background:#f0eefc;overflow:hidden;margin:8px 0}
+  .meter div{height:100%;width:0;transition:width .6s;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:13px}
+  .big-emoji{font-size:34px}
+  label.sl{display:block;margin:10px 0 2px;font-weight:bold;font-size:14px}
+  input[type=range]{width:100%;accent-color:var(--dn)}
+  .res{background:var(--soft);border-radius:12px;padding:10px 12px;margin:8px 0}
+  .res b.rk{display:inline-block;background:var(--dn);color:#fff;border-radius:999px;padding:1px 9px;font-size:12px;margin-right:6px}
+  .lists{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .item{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 8px;margin:5px 0;font-size:13px}
+  .item .nm{flex:1}
+  .item .pos{width:22px;height:22px;border-radius:50%;color:#fff;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:center}
+  svg text{font-family:inherit}
+  .status{font-size:13px;color:#6b6890;margin:6px 0}
+  footer{text-align:center;color:#6b6890;font-size:12px;padding:0 14px 24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="dots"><span style="background:#ff7a1a"></span><span style="background:#7c5cff;"></span><span style="background:#16c79a"></span></div>
+  <h1>🔎 Search Showdown</h1>
+  <p>BM25 vs Meaning vs Hybrid · Group 4 · CS F469 · play with the ideas behind our project</p>
+</header>
+
+<nav id="tabs">
+  <button data-t="arena" class="on">🏆 Arena</button>
+  <button data-t="match">🧪 Word Match Lab</button>
+  <button data-t="bm">🎛️ BM25 Lab</button>
+  <button data-t="dense">🧠 Dense Lab</button>
+  <button data-t="hyb">🤝 Hybrid Lab</button>
+  <button data-t="live">⚡ Live Search</button>
+  <button data-t="mix">🔀 Mixer</button>
+  <button data-t="mini">🔍 Mini Search</button>
+</nav>
+
+<main>
+
+<!-- ARENA -->
+<section id="arena" class="on">
+  <div class="card">
+    <h2>🏆 The Arena: our real results</h2>
+    <p><span class="tag t-bm">BM25</span> words &nbsp; <span class="tag t-dn">Dense</span> meaning &nbsp; <span class="tag t-hy">Hybrid</span> both merged</p>
+    <p>Numbers come from our notebook (20 queries, 209,527 news articles). Pick a view:</p>
+    <div class="pills" id="arenaPills"></div>
+    <div id="arenaBars"></div>
+    <div class="note" id="arenaNote"></div>
+  </div>
+  <div class="card">
+    <h2>⚡ Speed and size</h2>
+    <div class="grid3">
+      <div class="stat" style="background:var(--bm)"><small>BM25</small><b>2 ms</b><small>27 MB · built in 27 s</small></div>
+      <div class="stat" style="background:var(--dn)"><small>Dense</small><b>39 ms</b><small>307 MB · built in 216 s</small></div>
+      <div class="stat" style="background:var(--hy)"><small>Hybrid</small><b>41 ms</b><small>334 MB · built in 243 s</small></div>
+    </div>
+    <div class="note">Dense is about 20× slower per query and 11× bigger than BM25. None of the quality differences is statistically proven with only 20 queries, so call them trends.</div>
+  </div>
+</section>
+
+<!-- WORD MATCH LAB -->
+<section id="match">
+  <div class="card">
+    <h2>🧪 Word Match Lab</h2>
+    <p>BM25 only finds an article if it shares words with your query. Type a query and an article to see how many words they share. This is the same idea as our coverage experiment.</p>
+    <label class="sl">Query</label>
+    <input type="text" id="mq" value="carmaker pulls faulty automobiles off the road over safety fears">
+    <label class="sl">Article (headline and description)</label>
+    <textarea id="ma">Fiat Chrysler To Be Hit With Record $105 Million Fine Over Safety Recalls</textarea>
+    <div class="pills" style="margin-top:8px">
+      <button id="ex1">Example: different wording</button>
+      <button id="ex2">Example: exact name</button>
+      <button id="ex3">Example: no shared words</button>
+    </div>
+    <label><input type="checkbox" id="mstem" checked> Cut word endings (stemming, approximate here)</label><br>
+    <button class="big" id="mgo">Calculate ✨</button>
+    <div id="mout"></div>
+  </div>
+</section>
+
+<!-- BM25 LAB -->
+<section id="bm">
+  <div class="card">
+    <h2>🎛️ BM25 Lab</h2>
+    <p>This is the real BM25 formula for <b>one word</b> in <b>one article</b>. Move the sliders and watch the score.</p>
+    <label class="sl">Times the word appears in the article: <span id="v_tf">3</span></label>
+    <input type="range" id="tf" min="0" max="20" value="3">
+    <label class="sl">How rare the word is (IDF): <span id="v_idf">4.0</span></label>
+    <input type="range" id="idf" min="0" max="8" step="0.1" value="4">
+    <label class="sl">Article length in words: <span id="v_dl">18</span></label>
+    <input type="range" id="dl" min="3" max="100" value="18">
+    <label class="sl">Average article length: <span id="v_avg">18</span></label>
+    <input type="range" id="avg" min="5" max="60" value="18">
+    <label class="sl">k1 (how fast repeats stop helping): <span id="v_k1">1.5</span></label>
+    <input type="range" id="k1" min="0" max="3" step="0.1" value="1.5">
+    <label class="sl">b (how much long articles are penalised): <span id="v_b">0.75</span></label>
+    <input type="range" id="b" min="0" max="1" step="0.05" value="0.75">
+    <div class="res" style="text-align:center"><span class="big-emoji">🎯</span><br><b style="font-size:26px" id="bmScore">0</b><br><small id="bmCeil"></small></div>
+    <svg id="curve" viewBox="0 0 320 170" width="100%"></svg>
+    <div class="note">Repeating a word helps less and less. The curve flattens towards a ceiling of IDF × (k1 + 1). Our project uses k1 = 1.5 and b = 0.75.</div>
+  </div>
+</section>
+
+
+<!-- DENSE LAB -->
+<section id="dense">
+  <div class="card">
+    <h2>🧠 Dense Lab: search by meaning</h2>
+    <div class="note" style="margin-top:0">This lab is an <b>illustration</b> (for the real model, open ⚡ Live Search). The positions below are hand-placed to show the idea. The real model (MiniLM) turns every article into 384 numbers learned from data, and compares them in the same way (cosine).</div>
+    <p>Every headline is a <b>direction</b> on the circle. Headlines with similar meaning point the same way. The pink arrow is your query. Articles are ranked by <b>cosine similarity</b>: the closer the direction, the higher the score. No shared words are needed.</p>
+    <div class="pills" id="dpills"></div>
+    <label class="sl">Query text (used for the BM25 comparison)</label>
+    <input type="text" id="dtext">
+    <label class="sl">Query direction (meaning): <span id="v_dang">22°</span></label>
+    <input type="range" id="dang" min="0" max="359" value="22">
+    <svg id="dsvg" viewBox="0 0 320 300" width="100%" style="max-width:380px;display:block;margin:6px auto"></svg>
+    <h3><span class="tag t-dn">Dense ranking (by cosine)</span></h3>
+    <div id="dlist"></div>
+    <h3><span class="tag t-bm">What BM25 finds for the same text</span></h3>
+    <div id="dbm"></div>
+  </div>
+  <div class="card">
+    <h2>🧮 Cosine calculator</h2>
+    <p>Cosine similarity compares the <b>direction</b> of two lists of numbers. Edit the numbers (our model uses 384 per article; here we use 3).</p>
+    <div class="lists">
+      <div><b>Vector A</b><br><input type="text" id="ca" value="2, 1, 0"></div>
+      <div><b>Vector B</b><br><input type="text" id="cb" value="4, 2, 1"></div>
+    </div>
+    <div class="res" id="cout"></div>
+    <div class="note">Our dense engine scales every vector to length 1. Then the plain dot product equals the cosine, which is why FAISS can use an inner-product index.</div>
+  </div>
+</section>
+
+<!-- HYBRID LAB -->
+<section id="hyb">
+  <div class="card">
+    <h2>🤝 Hybrid Lab: word + meaning</h2>
+    <div class="note" style="margin-top:0">For the real Dense and Hybrid, open ⚡ Live Search. BM25 here is <b>real</b> (12 sample headlines). The Dense column is the <b>illustration</b> from the Dense Lab. The merge uses the <b>real</b> rank-fusion formula.</div>
+    <p>Pick a query. See what each engine returns, then how the hybrid merges them.</p>
+    <div class="pills" id="hpills"></div>
+    <div class="pills" id="hmode">
+      <button data-m="rrf" class="on">Merge by rank (RRF)</button>
+      <button data-m="raw">Merge by raw score</button>
+    </div>
+    <label class="sl">k (smoothing constant): <span id="v_hk">60</span></label>
+    <input type="range" id="hk" min="1" max="100" value="60">
+    <label class="sl">BM25 weight: <span id="v_hw">0.50</span></label>
+    <input type="range" id="hw" min="0" max="1" step="0.05" value="0.5">
+    <div class="lists" style="margin-top:10px">
+      <div><span class="tag t-bm">BM25 (words)</span><div id="hb"></div></div>
+      <div><span class="tag t-dn">Dense (meaning)</span><div id="hd"></div></div>
+      <div><span class="tag t-hy">Hybrid</span><div id="hh"></div></div>
+    </div>
+    <div class="note" id="hnote"></div>
+  </div>
+</section>
+
+
+<!-- LIVE SEARCH -->
+<section id="live">
+  <div class="card">
+    <h2>⚡ Live Search: real BM25 + real Dense + Hybrid</h2>
+    <div class="note" style="margin-top:0">Runs in your browser, no app needed. The meaning model is the real <b>multi-qa-MiniLM-L6-cos-v1</b> (the same model as our notebook), downloaded once from the internet (about 23 MB). It searches a <b>sample</b> of articles (up to 2,000), because a browser cannot encode all 209,527 quickly. The full comparison is in the notebook.</div>
+
+    <h3>Step 1: load the meaning model</h3>
+    <button class="big" id="lmodel">Load model</button>
+    <div class="status" id="lmstat">Not loaded yet.</div>
+
+    <h3>Step 2: choose the articles</h3>
+    <p>Use the 13 sample headlines below, paste your own (one per line), or upload <b>News_Category_Dataset_v3.json</b> (unzipped) and take a sample.</p>
+    <textarea id="lcorpus" style="min-height:120px"></textarea>
+    <p style="margin-top:8px"><input type="file" id="lfile" accept=".json,.txt">
+      &nbsp; Sample size: <select id="ln"><option>300</option><option selected>500</option><option>1000</option><option>2000</option></select></p>
+    <button class="big" id="lbuild">Prepare articles</button>
+    <div class="status" id="lbstat"></div>
+
+    <h3>Step 3: search</h3>
+    <input type="text" id="lq" value="carmaker pulls faulty automobiles off the road over safety fears">
+    <button class="big" id="lgo">Search 🚀</button>
+    <label class="sl">k (smoothing constant): <span id="v_lk">60</span></label>
+    <input type="range" id="lk" min="1" max="100" value="60">
+    <label class="sl">BM25 weight in the hybrid: <span id="v_lw">0.50</span></label>
+    <input type="range" id="lw" min="0" max="1" step="0.05" value="0.5">
+    <div class="lists" style="margin-top:12px">
+      <div><span class="tag t-bm">BM25 (words)</span><div id="lb"></div></div>
+      <div><span class="tag t-dn">Dense (meaning)</span><div id="ld"></div></div>
+      <div><span class="tag t-hy">Hybrid (RRF)</span><div id="lh"></div></div>
+    </div>
+    <div class="note">BM25 here uses no stemming. Dense is the real MiniLM model. Hybrid merges the two lists by rank. Results only reflect the sample you prepared.</div>
+  </div>
+</section>
+
+<!-- MIXER -->
+<section id="mix">
+  <div class="card">
+    <h2>🔀 The Mixer (Reciprocal Rank Fusion)</h2>
+    <p>The hybrid merges two ranked lists by rank, not by score. Each article earns <b>weight ÷ (k + position)</b> from each list. Move articles up or down and watch the merged list change.</p>
+    <div class="lists">
+      <div><span class="tag t-bm">BM25 list</span><div id="listB"></div></div>
+      <div><span class="tag t-dn">Dense list</span><div id="listD"></div></div>
+    </div>
+    <label class="sl">k (smoothing constant): <span id="v_rk">60</span></label>
+    <input type="range" id="rk" min="1" max="100" value="60">
+    <label class="sl">BM25 weight: <span id="v_rw">0.5</span> &nbsp;(Dense gets the rest)</label>
+    <input type="range" id="rw" min="0" max="1" step="0.05" value="0.5">
+    <h3><span class="tag t-hy">Merged list</span></h3>
+    <div id="merged"></div>
+    <div class="note">Example articles for illustration. Articles that both engines rank high rise to the top. Our final settings are k = 60 and equal weights.</div>
+  </div>
+</section>
+
+<!-- MINI SEARCH -->
+<section id="mini">
+  <div class="card">
+    <h2>🔍 Mini Search</h2>
+    <p>A tiny BM25 search over <b>12 sample headlines written for this demo</b> (not our dataset). It shows how word matching behaves. Dense and Hybrid need the full app on a laptop.</p>
+    <input type="text" id="sq" value="carmaker pulls faulty automobiles off the road over safety fears">
+    <div class="pills" style="margin-top:8px">
+      <button class="exq">carmaker pulls faulty automobiles off the road over safety fears</button>
+      <button class="exq">vaccine news not about boosters</button>
+      <button class="exq">Fed raises interest rates</button>
+      <button class="exq">economic downturn warning signs</button>
+    </div>
+    <button class="big" id="sgo">Search 🚀</button>
+    <div id="sout"></div>
+  </div>
+</section>
+
+</main>
+<footer>Arena numbers are from our notebook. The labs use the same formulas as our code. In the Dense Lab and Hybrid Lab the meaning positions are hand-placed illustrations. The ⚡ Live Search tab runs the real MiniLM model on a sample; the full comparison is in the notebook. Group 4 · CS F469.</footer>
+
+<script>
+/* ---------- PURE LOGIC (same ideas as the notebook) ---------- */
+const NEG = new Set(["no","not","never","without","neither","nor","none","nobody","nothing","nowhere"]);
+const STOP = new Set("a an the and or but if because as until while of at by for with about into through during before after above below to from up down in out on off over under again further then once here there when where why how all any both each few more most other some such only own same so than too very can will just should now is are was were be been being have has had having do does did doing would could ought i me my myself we our ours ourselves you your yours yourself he him his himself she her hers herself it its itself they them their theirs themselves what which who whom this that these those am said says".split(" ").filter(w=>!NEG.has(w)));
+const CONTR = [[/\bwon't\b/g,"will not"],[/\bcan't\b/g,"cannot"],[/\bshan't\b/g,"shall not"],[/\bain't\b/g,"is not"],[/n't\b/g," not"],[/'re\b/g," are"],[/'ve\b/g," have"],[/'ll\b/g," will"],[/'d\b/g," would"],[/\bi'm\b/g,"i am"],[/\blet's\b/g,"let us"]];
+function clean(text, stem){
+  let s = String(text||"").toLowerCase().replace(/[’‘]/g,"'");
+  s = s.normalize("NFKD").replace(/[\u0300-\u036f]/g,"");
+  s = s.replace(/\b([a-z])\.([a-z])\.(?:([a-z])\.)?/g,(m,a,b,c)=>[a,b,c].filter(Boolean).join(""));
+  s = s.replace(/\b([a-z])\.([a-z])\b/g,"$1$2");
+  for(const [re,rep] of CONTR) s = s.replace(re,rep);
+  s = s.replace(/'s\b/g,"").replace(/s'\b/g,"s").replace(/-/g," ");
+  let toks = (s.match(/\b[a-z0-9]+\b/g)||[]).filter(t=>!STOP.has(t) && (t.length>1||NEG.has(t)));
+  if(stem) toks = toks.map(t=> t.length>3 ? t.replace(/(ies|es|s|ed|ing)$/,"") : t);
+  return toks;
+}
+function coverage(q, a, stem){
+  const qs = [...new Set(clean(q,stem))], aset = new Set(clean(a,stem));
+  const shared = qs.filter(w=>aset.has(w));
+  return {qs, shared, cov: qs.length? shared.length/qs.length : 0};
+}
+function bucketOf(c){ return c===0?"near-zero": c<0.25?"low": c<0.5?"medium":"high"; }
+function bm25Term(tf, idf, dl, avgdl, k1, b){
+  if(tf<=0) return 0;
+  return idf * (tf*(k1+1)) / (tf + k1*(1 - b + b*dl/avgdl));
+}
+function rrfMerge(lists, weights, k){
+  const pts = new Map();
+  lists.forEach((lst,li)=> lst.forEach((id,r)=>{
+    pts.set(id, (pts.get(id)||0) + weights[li]/(k + r + 1));
+  }));
+  return [...pts.entries()].sort((x,y)=> y[1]-x[1] || (x[0]<y[0]?-1:1));
+}
+function buildIndex(texts){
+  const docs = texts.map(t=>clean(t,false)), N = docs.length;
+  const inv = new Map(); let tot=0;
+  docs.forEach((toks,i)=>{ tot+=toks.length; const tf=new Map(); toks.forEach(t=>tf.set(t,(tf.get(t)||0)+1));
+    tf.forEach((c,t)=>{ if(!inv.has(t)) inv.set(t,[]); inv.get(t).push([i,c]); }); });
+  return {docs, N, inv, avgdl: tot/Math.max(N,1)};
+}
+function searchIndex(ix, q, k){
+  const qterms = [...new Set(clean(q,false))], sc = new Map();
+  for(const t of qterms){ const p = ix.inv.get(t); if(!p) continue;
+    const idf = Math.log(1 + (ix.N - p.length + 0.5)/(p.length + 0.5));
+    for(const [i,tf] of p) sc.set(i,(sc.get(i)||0) + bm25Term(tf, idf, ix.docs[i].length, ix.avgdl, 1.5, 0.75)); }
+  return {qterms, ranked:[...sc.entries()].sort((a,b)=>b[1]-a[1]||a[0]-b[0]).slice(0,k)};
+}
+
+
+/* ---------- LAB DATA (illustration: angles are hand-placed) ---------- */
+const LAB = [
+ {t:"Ford recalls defective cars over safety concerns", a:20},
+ {t:"Toyota pulls half a million automobiles off the road", a:28},
+ {t:"Brake defect forces vehicle maker to withdraw trucks", a:15},
+ {t:"Fed raises interest rates again amid inflation worries", a:110},
+ {t:"Fed officials signal a pause in rate hikes", a:118},
+ {t:"Recession fears grip markets as growth slows", a:125},
+ {t:"Health experts weigh in on the latest vaccine rollout", a:200},
+ {t:"Booster shots open to all adults this fall", a:208},
+ {t:"Hurricane brings flooding to coastal towns", a:290},
+ {t:"Study links ocean warming to falling fish populations", a:300},
+ {t:"Local team wins championship after penalty shootout", a:70},
+ {t:"New public transit line to connect downtown and the airport", a:45},
+ {t:"Vegan dinner recipes for busy weeknights", a:160}
+];
+const LABQ = [
+ {q:"carmaker pulls faulty automobiles off the road over safety fears", a:22},
+ {q:"central bank raises borrowing costs", a:115},
+ {q:"vaccine news not about boosters", a:204},
+ {q:"economic downturn warning signs", a:122}
+];
+const LIX = buildIndex(LAB.map(d=>d.t));
+const rad = d => d*Math.PI/180;
+function cosAngle(a,b){ return Math.cos(rad(a-b)); }
+function denseRank(qa,k){ return LAB.map((d,i)=>[i,cosAngle(qa,d.a)]).sort((x,y)=>y[1]-x[1]||x[0]-y[0]).slice(0,k); }
+function cosine(a,b){
+  const dot=a.reduce((s,x,i)=>s+x*(b[i]||0),0), na=Math.hypot(...a), nb=Math.hypot(...b);
+  return {dot, na, nb, cos:(na&&nb)? dot/(na*nb):0};
+}
+function hybridLab(query, qa, k, w, mode){
+  const b = searchIndex(LIX, query, 5).ranked, d = denseRank(qa, 5);
+  let merged;
+  if(mode==="rrf"){
+    merged = rrfMerge([b.map(x=>x[0]), d.map(x=>x[0])],[2*w,2*(1-w)],k);
+  } else {
+    const m = new Map();
+    b.forEach(([i,s])=>m.set(i,(m.get(i)||0)+s)); d.forEach(([i,s])=>m.set(i,(m.get(i)||0)+s));
+    merged = [...m.entries()].sort((x,y)=>y[1]-x[1]||x[0]-y[0]);
+  }
+  return {b,d,merged};
+}
+
+/* ---------- UI ---------- */
+if (typeof document !== "undefined") {
+const $ = id => document.getElementById(id);
+const COL = {BM25:"var(--bm)", Dense:"var(--dn)", Hybrid:"var(--hy)"};
+
+// tabs
+document.querySelectorAll("#tabs button").forEach(b=> b.onclick = ()=>{
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.remove("on"));
+  document.querySelectorAll("section").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); $(b.dataset.t).classList.add("on");
+});
+
+// ARENA
+const VIEWS = {
+  "Overall (lenient)": {max:1, fmt:v=>v.toFixed(3), rows:[
+    ["NDCG@5",[.369,.395,.368]],["NDCG@10",[.351,.399,.374]],["MAP",[.294,.322,.322]],["Recall@10",[.276,.334,.292]],["Recall@100",[.559,.591,.633]]],
+    note:"Dense ranks the best articles highest (NDCG@10). Hybrid finds the most correct articles (Recall@100). BM25 scores lowest on NDCG@10 but is the cheapest."},
+  "Overall (strict)": {max:1, fmt:v=>v.toFixed(3), rows:[
+    ["NDCG@5",[.368,.387,.367]],["NDCG@10",[.354,.405,.382]],["MAP",[.308,.348,.337]],["Recall@10",[.317,.388,.350]],["Recall@100",[.628,.662,.732]]],
+    note:"Strict mode counts only fully correct articles. The ordering of the engines is the same."},
+  "By query type": {max:1, fmt:v=>v.toFixed(3), rows:[
+    ["Negation",[.110,.035,.069]],["Homonym",[.360,.385,.418]],["Temporal",[.279,.407,.342]],["Different wording",[.204,.336,.232]],["Exact name",[1,1,1]]],
+    note:"NDCG@10 by query type. Dense wins when the words differ. Everyone struggles with negation. Exact names are too easy to separate the engines."},
+  "Shared words": {max:100, fmt:v=>v+"%", rows:[
+    ["No shared words (36)",[0,44,25]],["Low overlap (90)",[13,28,28]],["Medium overlap (114)",[61,44,58]],["High overlap (48)",[96,65,81]]],
+    note:"Share of correct articles found in the top 100. With no shared words BM25 finds none, while Dense still finds 44%. At high overlap BM25 finds 96%."}
+};
+const names = ["BM25","Dense","Hybrid"];
+let curView = "Overall (lenient)";
+function drawArena(){
+  const v = VIEWS[curView];
+  $("arenaPills").innerHTML = Object.keys(VIEWS).map(k=>`<button class="${k===curView?'on':''}" data-v="${k}">${k}</button>`).join("");
+  $("arenaPills").querySelectorAll("button").forEach(b=> b.onclick=()=>{curView=b.dataset.v; drawArena();});
+  $("arenaBars").innerHTML = v.rows.map(([lab,vals])=>{
+    const mx = Math.max(...vals), winners = names.filter((n,i)=>vals[i]===mx);
+    const badge = winners.length===3 ? "🤝 Tie" : "🏅 "+winners.join(" + ");
+    return `<div class="row"><div class="lab"><span>${lab}</span><span class="win">${badge}</span></div>` +
+      vals.map((x,i)=>`<div class="bar"><span class="n" style="color:${COL[names[i]]}">${names[i]}</span><div class="track"><div class="fill" data-w="${x/v.max*100}" style="background:${COL[names[i]]}"></div></div><span class="v">${v.fmt(x)}</span></div>`).join("") + `</div>`;
+  }).join("");
+  $("arenaNote").textContent = v.note + "  (With 20 queries, none of the differences is statistically proven.)";
+  requestAnimationFrame(()=> requestAnimationFrame(()=> document.querySelectorAll("#arenaBars .fill").forEach(f=> f.style.width = f.dataset.w+"%")));
+}
+drawArena();
+
+// WORD MATCH LAB
+const BUCKET = {"near-zero":["#ef476f","😵","No shared words: BM25 cannot find this article at all."],
+  "low":["#ff7a1a","😕","Few shared words: BM25 struggles."],
+  "medium":["#f4b400","🙂","Some shared words: BM25 does reasonably."],
+  "high":["#16c79a","🎯","Many shared words: BM25 finds it easily."]};
+function runMatch(){
+  const r = coverage($("mq").value, $("ma").value, $("mstem").checked);
+  if(r.qs.length===0){ $("mout").innerHTML='<div class="note">Type a more specific query first.</div>'; return; }
+  const bk = bucketOf(r.cov), [colr, em, msg] = BUCKET[bk];
+  $("mout").innerHTML = `
+    <h3>Query words (after cleaning)</h3>
+    <div>${r.qs.map(w=>`<span class="chip ${r.shared.includes(w)?'shared':'miss'}">${w}</span>`).join("")}</div>
+    <p>Shared: <b>${r.shared.length}</b> of ${r.qs.length} words &nbsp;→&nbsp; coverage = <b>${r.cov.toFixed(2)}</b></p>
+    <div class="meter"><div id="mfill" style="background:${colr}">${Math.round(r.cov*100)}%</div></div>
+    <p><span class="big-emoji">${em}</span> <b>${bk.toUpperCase()}</b>: ${msg}</p>`;
+  requestAnimationFrame(()=> requestAnimationFrame(()=>{ const f=$("mfill"); if(f) f.style.width = Math.max(r.cov*100,6)+"%"; }));
+}
+$("mgo").onclick = runMatch;
+$("ex1").onclick = ()=>{ $("mq").value="carmaker pulls faulty automobiles off the road over safety fears"; $("ma").value="Fiat Chrysler To Be Hit With Record $105 Million Fine Over Safety Recalls"; runMatch(); };
+$("ex2").onclick = ()=>{ $("mq").value="Vontae Davis Buffalo Bills cornerback quits"; $("ma").value="Cornerback Vontae Davis quits Buffalo Bills at halftime (example text)"; runMatch(); };
+$("ex3").onclick = ()=>{ $("mq").value="economic downturn warning signs"; $("ma").value="Analysts fear a recession as consumer spending falls (example text)"; runMatch(); };
+runMatch();
+
+// BM25 LAB
+function drawBM(){
+  const g = id=>parseFloat($(id).value);
+  const tf=g("tf"), idf=g("idf"), dl=g("dl"), avg=g("avg"), k1=g("k1"), b=g("b");
+  $("v_tf").textContent=tf; $("v_idf").textContent=idf.toFixed(1); $("v_dl").textContent=dl; $("v_avg").textContent=avg; $("v_k1").textContent=k1.toFixed(1); $("v_b").textContent=b.toFixed(2);
+  const sc = bm25Term(tf,idf,dl,avg,k1,b), ceil = idf*(k1+1);
+  $("bmScore").textContent = sc.toFixed(2);
+  $("bmCeil").textContent = `Ceiling for this word: ${ceil.toFixed(2)} (IDF × (k1+1))`;
+  const W=320,H=170,L=30,Bm=26,T=14,R=10, maxY=Math.max(ceil,0.5)*1.08;
+  const X=x=>L+x/20*(W-L-R), Y=y=>H-Bm-(y/maxY)*(H-Bm-T);
+  let path=""; for(let x=0;x<=20;x+=0.25){ path += (x===0?"M":"L")+X(x).toFixed(1)+" "+Y(bm25Term(x,idf,dl,avg,k1,b)).toFixed(1)+" "; }
+  $("curve").innerHTML = `
+    <line x1="${L}" y1="${H-Bm}" x2="${W-R}" y2="${H-Bm}" stroke="#bbb"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H-Bm}" stroke="#bbb"/>
+    <line x1="${L}" y1="${Y(ceil)}" x2="${W-R}" y2="${Y(ceil)}" stroke="#ff4d8d" stroke-dasharray="4 4"/>
+    <text x="${W-R}" y="${Y(ceil)-4}" text-anchor="end" font-size="10" fill="#ff4d8d">ceiling</text>
+    <path d="${path}" fill="none" stroke="#7c5cff" stroke-width="3"/>
+    <circle cx="${X(tf)}" cy="${Y(sc)}" r="6" fill="#ff7a1a" stroke="#fff" stroke-width="2"/>
+    <text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle" font-size="11" fill="#6b6890">times the word appears</text>
+    <text x="4" y="${T+8}" font-size="10" fill="#6b6890">score</text>`;
+}
+["tf","idf","dl","avg","k1","b"].forEach(id=> $(id).addEventListener("input", drawBM));
+drawBM();
+
+// MIXER
+const ART = {A:"Ford recalls defective cars", B:"Toyota pulls automobiles off the road", C:"Carmaker fined over safety recalls", D:"Fed raises interest rates", E:"Airbag fears hit automaker", F:"Vehicle maker withdraws faulty SUVs"};
+const PCOL = ["#ff4d8d","#ff7a1a","#f4b400","#16c79a","#4cc9f0","#7c5cff"];
+let LB = ["A","B","C","D","E"], LD = ["C","F","A","E","B"];
+function listHtml(lst, which){
+  return lst.map((id,i)=>`<div class="item"><span class="pos" style="background:${PCOL[i]}">${i+1}</span><span class="nm"><b>${id}</b> ${ART[id]}</span><button class="sm" data-w="${which}" data-i="${i}" data-d="-1">▲</button><button class="sm" data-w="${which}" data-i="${i}" data-d="1">▼</button></div>`).join("");
+}
+function drawMix(){
+  const k=parseFloat($("rk").value), w=parseFloat($("rw").value);
+  $("v_rk").textContent=k; $("v_rw").textContent=w.toFixed(2);
+  $("listB").innerHTML = listHtml(LB,"B"); $("listD").innerHTML = listHtml(LD,"D");
+  document.querySelectorAll("#mix button.sm").forEach(bt=> bt.onclick=()=>{
+    const arr = bt.dataset.w==="B"?LB:LD, i=+bt.dataset.i, j=i+(+bt.dataset.d);
+    if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; drawMix();
+  });
+  const merged = rrfMerge([LB,LD],[2*w,2*(1-w)],k);
+  const mx = merged[0][1];
+  $("merged").innerHTML = merged.map(([id,p],i)=>{
+    const inB = LB.includes(id), inD = LD.includes(id);
+    return `<div class="item"><span class="pos" style="background:${PCOL[Math.min(i,5)]}">${i+1}</span><span class="nm"><b>${id}</b> ${ART[id]}<div class="track" style="margin-top:4px;background:#f0eefc;border-radius:99px;height:8px"><div style="width:${p/mx*100}%;height:100%;border-radius:99px;background:var(--hy)"></div></div></span><span style="font-size:12px">${p.toFixed(4)}<br>${inB&&inD?"both ✅":inB?"BM25 only":"Dense only"}</span></div>`;
+  }).join("");
+}
+$("rk").addEventListener("input", drawMix); $("rw").addEventListener("input", drawMix);
+drawMix();
+
+// MINI SEARCH
+const SAMPLE = [
+ "Ford recalls defective cars over safety concerns",
+ "Toyota pulls half a million automobiles off the road",
+ "Fed raises interest rates again amid inflation worries",
+ "Fed officials signal a pause in rate hikes",
+ "Recession fears grip markets as growth slows",
+ "Vegan dinner recipes for busy weeknights",
+ "Health experts weigh in on the latest vaccine rollout",
+ "Booster shots open to all adults this fall",
+ "Hurricane brings flooding to coastal towns",
+ "Local team wins championship after penalty shootout",
+ "New public transit line to connect downtown and the airport",
+ "Study links ocean warming to falling fish populations"
+];
+const IX = buildIndex(SAMPLE);
+function runMini(){
+  const q = $("sq").value, out = $("sout");
+  const {qterms, ranked} = searchIndex(IX, q, 5);
+  if(!qterms.length){ out.innerHTML='<div class="note">Type a more specific query.</div>'; return; }
+  if(!ranked.length){ out.innerHTML='<div class="note">😵 No headline shares a word with this query, so BM25 finds nothing. This is the vocabulary-mismatch problem. Meaning-based search could still find related headlines.</div>'; return; }
+  out.innerHTML = `<p style="font-size:13px">Cleaned query words: ${qterms.join(", ")}</p>` + ranked.map(([i,s],n)=>{
+    const sh = qterms.filter(t=>IX.docs[i].includes(t));
+    return `<div class="res"><b class="rk">${n+1}</b><b>${SAMPLE[i]}</b><div style="font-size:12px;color:#6b6890">score ${s.toFixed(2)} · coverage ${(sh.length/qterms.length).toFixed(2)}</div><div>${qterms.map(t=>`<span class="chip ${sh.includes(t)?'shared':'miss'}">${t}</span>`).join("")}</div></div>`;
+  }).join("");
+}
+$("sgo").onclick = runMini;
+$("sq").addEventListener("keydown", e=>{ if(e.key==="Enter") runMini(); });
+document.querySelectorAll(".exq").forEach(b=> b.onclick=()=>{ $("sq").value=b.textContent; runMini(); });
+runMini();
+
+// ----- DENSE LAB -----
+const GCOL = i => ["#ff4d8d","#ff7a1a","#f4b400","#16c79a","#4cc9f0","#7c5cff","#ef476f","#06d6a0","#118ab2","#e0a800","#8338ec","#fb5607","#3a86ff"][i%13];
+function drawDense(){
+  const qa = parseFloat($("dang").value), text = $("dtext").value;
+  $("v_dang").textContent = qa + "°";
+  const cx=160, cy=150, r=105, pt=(ang,rr)=>[cx+rr*Math.cos(rad(ang)), cy-rr*Math.sin(rad(ang))];
+  let svg = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#faf8ff" stroke="#d9d3f5" stroke-width="2"/>`;
+  LAB.forEach((d,i)=>{ const [x,y]=pt(d.a,r); svg += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="${GCOL(i)}"/><text x="${x.toFixed(1)}" y="${(y+3.5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">${i+1}</text>`; });
+  const [qx,qy] = pt(qa, r-14);
+  svg += `<line x1="${cx}" y1="${cy}" x2="${qx.toFixed(1)}" y2="${qy.toFixed(1)}" stroke="#ff4d8d" stroke-width="4" stroke-linecap="round"/><circle cx="${qx.toFixed(1)}" cy="${qy.toFixed(1)}" r="6" fill="#ff4d8d"/><circle cx="${cx}" cy="${cy}" r="4" fill="#22223b"/><text x="${cx}" y="292" text-anchor="middle" font-size="11" fill="#6b6890">pink arrow = your query</text>`;
+  $("dsvg").innerHTML = svg;
+  $("dlist").innerHTML = denseRank(qa,6).map(([i,c])=>`<div class="item"><span class="pos" style="background:${GCOL(i)}">${i+1}</span><span class="nm">${LAB[i].t}<div style="margin-top:4px;background:#f0eefc;border-radius:99px;height:8px"><div style="width:${Math.max(0,c)*100}%;height:100%;border-radius:99px;background:var(--dn)"></div></div></span><span style="font-size:12px">cos ${c.toFixed(2)}</span></div>`).join("");
+  const bm = searchIndex(LIX, text, 3);
+  $("dbm").innerHTML = !bm.qterms.length ? '<div class="note">Type some words first.</div>' :
+    !bm.ranked.length ? '<div class="note">😵 No headline shares a word with this query, so BM25 finds nothing. The meaning search above still finds related headlines.</div>' :
+    bm.ranked.map(([i,sc])=>`<div class="item"><span class="pos" style="background:${GCOL(i)}">${i+1}</span><span class="nm">${LAB[i].t}</span><span style="font-size:12px">score ${sc.toFixed(2)}</span></div>`).join("");
+}
+$("dpills").innerHTML = LABQ.map((x,i)=>`<button data-i="${i}">${x.q.length>34? x.q.slice(0,34)+"…" : x.q}</button>`).join("");
+$("dpills").querySelectorAll("button").forEach(b=> b.onclick=()=>{ const x=LABQ[+b.dataset.i]; $("dtext").value=x.q; $("dang").value=x.a;
+  $("dpills").querySelectorAll("button").forEach(z=>z.classList.remove("on")); b.classList.add("on"); drawDense(); });
+$("dang").addEventListener("input", drawDense); $("dtext").addEventListener("input", drawDense);
+$("dtext").value = LABQ[0].q; $("dang").value = LABQ[0].a; $("dpills").querySelector("button").classList.add("on"); drawDense();
+
+function drawCos(){
+  const parse = t => t.split(/[ ,;]+/).filter(Boolean).map(Number);
+  const a = parse($("ca").value), b = parse($("cb").value);
+  if(!a.length || a.some(isNaN) || b.some(isNaN)){ $("cout").innerHTML = "Type numbers separated by commas."; return; }
+  const bb = a.map((_,i)=>b[i]||0), r = cosine(a,bb), nrm = v=>{const n=Math.hypot(...v)||1; return v.map(x=>x/n);};
+  const na = nrm(a), nb = nrm(bb), dotN = na.reduce((s,x,i)=>s+x*nb[i],0);
+  $("cout").innerHTML = `Dot product = <b>${r.dot.toFixed(2)}</b> · |A| = ${r.na.toFixed(3)} · |B| = ${r.nb.toFixed(3)}<br>Cosine = dot ÷ (|A|·|B|) = <b>${r.cos.toFixed(3)}</b><br><small>After scaling both to length 1, the plain dot product is ${dotN.toFixed(3)}, the same number.</small>`;
+}
+$("ca").addEventListener("input", drawCos); $("cb").addEventListener("input", drawCos); drawCos();
+
+// ----- HYBRID LAB -----
+let hq = 0, hmode = "rrf";
+function drawHybrid(){
+  const k = +$("hk").value, w = +$("hw").value; $("v_hk").textContent = k; $("v_hw").textContent = w.toFixed(2);
+  const q = LABQ[hq], {b,d,merged} = hybridLab(q.q, q.a, k, w, hmode);
+  const inB = new Set(b.map(x=>x[0])), inD = new Set(d.map(x=>x[0]));
+  const row = (i,n,txt,extra)=>`<div class="item"><span class="pos" style="background:${GCOL(i)}">${n}</span><span class="nm">${LAB[i].t}</span><span style="font-size:11px;text-align:right">${txt}${extra?"<br>"+extra:""}</span></div>`;
+  $("hb").innerHTML = b.length ? b.map(([i,s],n)=>row(i,n+1,"score "+s.toFixed(2))).join("") : '<div class="note">No result: no shared words.</div>';
+  $("hd").innerHTML = d.map(([i,c],n)=>row(i,n+1,"cos "+c.toFixed(2))).join("");
+  $("hh").innerHTML = merged.slice(0,6).map(([i,p],n)=>row(i,n+1,(hmode==="rrf"?"pts ":"sum ")+p.toFixed(hmode==="rrf"?4:2), inB.has(i)&&inD.has(i)?"both ✅":inB.has(i)?"BM25 only":"Dense only")).join("");
+  $("hnote").textContent = hmode==="rrf"
+    ? "Rank fusion: each article earns weight ÷ (k + position) from each list. Articles that both engines rank high rise to the top. If BM25 finds nothing, the hybrid falls back on Dense."
+    : "Raw scores: BM25 scores run up to about 5, while cosine scores stay between -1 and 1. So BM25 dominates the sum, which is why we merge by rank instead.";
+}
+$("hpills").innerHTML = LABQ.map((x,i)=>`<button data-i="${i}">${x.q.length>34? x.q.slice(0,34)+"…" : x.q}</button>`).join("");
+$("hpills").querySelectorAll("button").forEach(b=> b.onclick=()=>{ hq=+b.dataset.i; $("hpills").querySelectorAll("button").forEach(z=>z.classList.remove("on")); b.classList.add("on"); drawHybrid(); });
+$("hmode").querySelectorAll("button").forEach(b=> b.onclick=()=>{ hmode=b.dataset.m; $("hmode").querySelectorAll("button").forEach(z=>z.classList.remove("on")); b.classList.add("on"); drawHybrid(); });
+$("hk").addEventListener("input", drawHybrid); $("hw").addEventListener("input", drawHybrid);
+$("hpills").querySelector("button").classList.add("on"); drawHybrid();
+
+// ----- LIVE SEARCH (real MiniLM in the browser) -----
+const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MODEL_ID = "Xenova/multi-qa-MiniLM-L6-cos-v1";
+const TJS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+let extractor = null, modelReady = false;
+let LV = {recs:[], texts:[], ix:null, emb:null};
+$("lcorpus").value = LAB.map(d=>d.t).join("\n");
+
+async function embedTexts(texts, onProgress){
+  if(window.__embedOverride) return window.__embedOverride(texts);
+  const out = [];
+  for(let i=0;i<texts.length;i+=16){
+    const t = await extractor(texts.slice(i,i+16), {pooling:"mean", normalize:true});
+    out.push(...t.tolist());
+    if(onProgress) onProgress(Math.min(i+16,texts.length), texts.length);
+    await new Promise(r=>setTimeout(r,0));
+  }
+  return out.map(v=>Float32Array.from(v));
+}
+$("lmodel").onclick = async ()=>{
+  if(window.__embedOverride){ modelReady = true; $("lmstat").textContent = "✅ Test mode (stand-in embeddings)"; return; }
+  $("lmodel").disabled = true;
+  $("lmstat").textContent = "Loading the library...";
+  try{
+    const mod = await import(TJS_URL);
+    $("lmstat").textContent = "Downloading the model (about 23 MB, first time only)...";
+    extractor = await mod.pipeline("feature-extraction", MODEL_ID, {dtype:"q8", progress_callback:p=>{
+      if(p && p.status==="progress" && p.file) $("lmstat").textContent = "Downloading " + String(p.file).split("/").pop() + ": " + Math.round(p.progress||0) + "%";
+    }});
+    modelReady = true;
+    $("lmstat").textContent = "✅ Model ready: multi-qa-MiniLM-L6-cos-v1. Now click Prepare articles.";
+  }catch(e){
+    $("lmstat").innerHTML = "❌ Could not load the model: " + esc(e && e.message || e) + "<br>You need internet for the first load. BM25 search still works without it.";
+    $("lmodel").disabled = false;
+  }
+};
+
+$("lbuild").onclick = async ()=>{
+  const st = $("lbstat"); st.textContent = "Reading articles...";
+  await new Promise(r=>setTimeout(r,30));
+  let recs = [];
+  const f = $("lfile").files[0];
+  if(f){
+    const lines = (await f.text()).split("\n").filter(x=>x.trim());
+    const n = Math.min(+$("ln").value, lines.length), stride = Math.max(1, Math.floor(lines.length/n));
+    for(let i=0;i<n;i++){ try{ const r = JSON.parse(lines[i*stride]); recs.push({h:r.headline||"", d:r.short_description||"", c:r.category||"", dt:String(r.date||"").slice(0,10)}); }catch(e){} }
+  } else {
+    recs = $("lcorpus").value.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,2000).map(h=>({h, d:"", c:"", dt:""}));
+  }
+  if(!recs.length){ st.textContent = "No articles found. Paste some headlines or upload the dataset."; return; }
+  LV.recs = recs; LV.texts = recs.map(r=> r.h + (r.d? ". " + r.d : ""));
+  LV.ix = buildIndex(LV.texts); LV.emb = null;
+  if(!modelReady){ st.textContent = "Ready for BM25 with " + recs.length + " articles. For Dense and Hybrid, click Load model, then Prepare articles again."; return; }
+  try{
+    LV.emb = await embedTexts(LV.texts, (a,b)=>{ st.textContent = "Encoding articles: " + a + " / " + b; });
+    st.textContent = "✅ Ready: " + recs.length + " articles encoded. Now search.";
+  }catch(e){ st.innerHTML = "❌ Encoding failed: " + esc(e && e.message || e); }
+};
+
+function liveItem(i, n, txt, extra, qterms){
+  const r = LV.recs[i], doc = LV.ix.docs[i];
+  const chips = (qterms||[]).filter(t=>doc.includes(t)).map(t=>`<span class="chip shared">${esc(t)}</span>`).join("");
+  return `<div class="item" style="align-items:flex-start"><span class="pos" style="background:${GCOL(i)}">${n}</span><span class="nm"><b>${esc(r.h)}</b>${r.d? `<div style="font-size:12px;color:#6b6890">${esc(r.d.slice(0,110))}${r.d.length>110?"…":""}</div>`:""}<div>${chips}</div></span><span style="font-size:11px;text-align:right">${txt}${extra?"<br>"+extra:""}</span></div>`;
+}
+async function liveSearch(){
+  const q = $("lq").value.trim();
+  if(!LV.ix){ $("lb").innerHTML = '<div class="note">Click Prepare articles first.</div>'; return; }
+  if(!q) return;
+  const k = +$("lk").value, w = +$("lw").value;
+  $("v_lk").textContent = k; $("v_lw").textContent = w.toFixed(2);
+  const bm = searchIndex(LV.ix, q, 100), bIds = bm.ranked.map(x=>x[0]);
+  $("lb").innerHTML = bm.ranked.length ? bm.ranked.slice(0,5).map(([i,s],n)=>liveItem(i,n+1,"score "+s.toFixed(2),"",bm.qterms)).join("")
+    : '<div class="note">😵 No article shares a word with this query, so BM25 finds nothing.</div>';
+  if(!LV.emb){ $("ld").innerHTML = $("lh").innerHTML = '<div class="note">Dense needs the model: click Load model, then Prepare articles again.</div>'; return; }
+  const qv = (await embedTexts([q]))[0];
+  const sims = LV.emb.map((e,i)=>{ let d=0; for(let j=0;j<qv.length;j++) d+=e[j]*qv[j]; return [i,d]; });
+  sims.sort((a,b)=>b[1]-a[1]||a[0]-b[0]);
+  const dTop = sims.slice(0,100), dIds = dTop.map(x=>x[0]);
+  $("ld").innerHTML = dTop.slice(0,5).map(([i,c],n)=>liveItem(i,n+1,"cos "+c.toFixed(3),"",bm.qterms)).join("");
+  const merged = rrfMerge([bIds,dIds],[2*w,2*(1-w)],k).slice(0,5), inB = new Set(bIds.slice(0,100)), inD = new Set(dIds);
+  $("lh").innerHTML = merged.map(([i,p],n)=>liveItem(i,n+1,"pts "+p.toFixed(4), inB.has(i)&&inD.has(i)?"both ✅":inB.has(i)?"BM25 only":"Dense only", bm.qterms)).join("");
+}
+$("lgo").onclick = liveSearch;
+$("lq").addEventListener("keydown", e=>{ if(e.key==="Enter") liveSearch(); });
+$("lk").addEventListener("input", liveSearch); $("lw").addEventListener("input", liveSearch);
+
+}
+</script>
+</body>
+</html>
